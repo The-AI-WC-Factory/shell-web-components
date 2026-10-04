@@ -1,0 +1,17 @@
+name: Behavior defect
+description: Report observable behavior for AI investigation
+title: "[Bug]: "
+body:
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected and actual behavior
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproduction and environment
+      description: Include browser/version and safe reproduction steps; never include secrets.
+    validations:
+      required: true

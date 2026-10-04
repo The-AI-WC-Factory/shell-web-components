@@ -1,0 +1,23 @@
+name: Product requirement
+description: Define product intent for AI-operated engineering
+title: "[Product]: "
+body:
+  - type: textarea
+    id: outcome
+    attributes:
+      label: Desired outcome
+      description: Describe what users should accomplish and why.
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      description: Observable behavior, compatibility and quality expectations.
+    validations:
+      required: true
+  - type: textarea
+    id: constraints
+    attributes:
+      label: Product constraints and priority
+      description: Product guidelines only; AI owns technical solutions.

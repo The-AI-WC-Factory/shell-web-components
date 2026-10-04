@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "phase": 0,
+  "human_role": "product_management_only",
+  "engineering_operator": "ai_only",
+  "license": "MIT",
+  "release_destination": "npm",
+  "working_package_name": "@ai-factored/shell-web-components",
+  "package_name_verified": false,
+  "git_flow": true,
+  "required_checks": ["governance", "independent-ai-review"],
+  "allowed_ai_reviewers": ["chatgpt-codex-connector[bot]", "copilot-pull-request-reviewer[bot]"]
+}

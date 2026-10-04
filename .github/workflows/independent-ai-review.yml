@@ -1,0 +1,54 @@
+name: Independent AI review gate
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+  pull_request_review:
+    types: [submitted, edited, dismissed]
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: Pull request number to verify
+        required: true
+        type: string
+permissions:
+  contents: read
+  pull-requests: read
+jobs:
+  independent-ai-review:
+    name: independent-ai-review
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Verify current-head independent AI approval
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPOSITORY: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.pull_request.number || inputs.pr_number }}
+        shell: python
+        run: |
+          import json, os, subprocess
+          def api(path):
+              return json.loads(subprocess.check_output(['gh', 'api', path], text=True))
+          number = os.environ['PR_NUMBER']
+          if not number.isdigit():
+              raise SystemExit('A numeric PR number is required')
+          repo = os.environ['REPOSITORY']
+          pr = api(f'repos/{repo}/pulls/{number}')
+          allowed = {'chatgpt-codex-connector[bot]', 'copilot-pull-request-reviewer[bot]'}
+          latest = {}
+          page = 1
+          while True:
+              reviews = api(f'repos/{repo}/pulls/{number}/reviews?per_page=100&page={page}')
+              for review in reviews:
+                  user = review['user']
+                  if user['login'] in allowed and user['type'] == 'Bot' and user['login'] != pr['user']['login']:
+                      latest[user['login']] = review
+              if len(reviews) < 100:
+                  break
+              page += 1
+          for review in latest.values():
+              if review['state'] == 'APPROVED' and review['commit_id'] == pr['head']['sha']:
+                  print(f"Independent AI approval verified: {review['html_url']} at {pr['head']['sha']}")
+                  break
+          else:
+              raise SystemExit('BLOCKED: provision an independent AI reviewer and obtain APPROVED review on the current head. Human approvals, comments and self-review do not satisfy this gate.')
