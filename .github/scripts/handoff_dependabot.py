@@ -66,8 +66,13 @@ def handoff(number, dry_run=False):
     issue = api(f'{root}/issues', {'title': marker,
         'body': f'AI dependency maintenance from {pr["html_url"]}.\n\nAcceptance: native Issue-linked feature PR, pinned Actions, passing governance, current-head independent AI approval and gated merge. Close the original candidate only after the feature PR merges.'})
     branch = f'feature/{issue["number"]}-dependency-update'
-    # Candidate SHA is a verified descendant of current develop; preserve its history.
-    api(f'{root}/git/refs', {'ref': f'refs/heads/{branch}', 'sha': pr['head']['sha']})
+    # Preserve candidate history with a distinct commit so its still-open PR
+    # cannot share the trusted check's commit identity with the handoff PR.
+    candidate = api(f'{root}/git/commits/{pr["head"]["sha"]}')
+    commit = api(f'{root}/git/commits', {
+        'message': f'chore: AI dependency handoff (refs #{issue["number"]})',
+        'tree': candidate['tree']['sha'], 'parents': [pr['head']['sha']]})
+    api(f'{root}/git/refs', {'ref': f'refs/heads/{branch}', 'sha': commit['sha']})
     proposed = api(f'{root}/pulls', {'title': f'chore: apply dependency candidate #{number}',
         'head': branch, 'base': 'develop', 'draft': True,
         'body': f'Refs #{issue["number"]}\n\nAI-operated dependency handoff from {pr["html_url"]}. No candidate code was executed. Obtain passing governance and independent AI approval before merge.'})
