@@ -62,6 +62,7 @@ def handoff(number, dry_run=False):
     fresh = api(f'{root}/pulls/{number}')
     if (fresh['head']['sha'], fresh['base']['sha']) != (pr['head']['sha'], pr['base']['sha']):
         raise ValueError('Candidate changed during preflight; retry')
+    validate_candidate(fresh, comparison, files)
     issue = api(f'{root}/issues', {'title': marker,
         'body': f'AI dependency maintenance from {pr["html_url"]}.\n\nAcceptance: native Issue-linked feature PR, pinned Actions, passing governance, current-head independent AI approval and gated merge. Close the original candidate only after the feature PR merges.'})
     branch = f'feature/{issue["number"]}-dependency-update'

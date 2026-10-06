@@ -66,6 +66,8 @@ if pr:
     hotfix = bool(re.fullmatch(r'hotfix/\d+-[a-z0-9][a-z0-9-]*', head))
     release = bool(re.fullmatch(r'release/\d+\.\d+\.\d+(?:-[a-z0-9.-]+)?', head))
     promotion = (policy.get('phase') == 0 and head == 'develop' and base == 'main'
+                 and pr['head'].get('repo') is not None
+                 and pr['head']['repo']['full_name'] == pr['base']['repo']['full_name']
                  and title == 'chore: promote Phase 0 governance'
                  and 'Phase 0 governance promotion' in body)
     valid = ((base == 'develop' and (feature or release or hotfix))
