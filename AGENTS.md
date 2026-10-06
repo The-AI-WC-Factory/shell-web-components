@@ -20,3 +20,6 @@ Every PR must have a native GitHub Development link to its corresponding Issue; 
 All merges must use the independently reviewed `merge_guard.py` from the trusted control repository, executed outside PR-controlled workflows. Re-read live current-head AI approval immediately before a SHA-bound merge. Stop on API errors or revoked approval; never rely only on a cached successful check or bypass native protection.
 
 After deployment of the dedicated App-only update restriction, only the reviewed protected-main worker in the control repository may merge target protected branches. It must use live merge_guard authorization and respect the separate required-review/check ruleset without bypass. Do not dispatch merges before the App permission change and actor restriction have been explicitly authorized and verified.
+
+## Review cost control
+Do not request Copilot review on each edit, push, or retry. Automatic Copilot reviews stay disabled. Consolidate the complete fix set, audit it locally and pass CI before one explicitly authorized review request. Do not increase spending limits or model effort without user approval. Do not treat a comment-only review or quota error as approval.

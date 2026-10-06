@@ -1,61 +1,13 @@
 name: Independent AI review gate
 on:
-  pull_request:
-    types: [opened, synchronize, reopened, ready_for_review]
   pull_request_review:
     types: [submitted, edited, dismissed]
-permissions:
-  contents: read
-  pull-requests: read
+permissions: {}
 jobs:
-  independent-ai-review:
-    name: independent-ai-review
+  review-state-notification:
+    name: review-state-notification
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - name: Verify current-head independent AI approval
-        env:
-          GH_TOKEN: ${{ github.token }}
-          REPOSITORY: ${{ github.repository }}
-          PR_NUMBER: ${{ github.event.pull_request.number }}
-        shell: python
-        run: |
-          import json, os, subprocess
-          def api(path):
-              return json.loads(subprocess.check_output(['gh', 'api', path], text=True))
-          number = os.environ['PR_NUMBER']
-          if not number.isdigit():
-              raise SystemExit('A numeric PR number is required')
-          repo = os.environ['REPOSITORY']
-          pr = api(f'repos/{repo}/pulls/{number}')
-          import base64
-          # Policy comes from protected base code, never the proposed PR policy.
-          base_sha = pr['base']['sha']
-          policy_path = f'repos/{repo}/contents/.github/ai-dlc.json?ref={base_sha}'
-          try:
-              policy_file = api(policy_path)
-          except subprocess.CalledProcessError as error:
-              # Exact immutable bootstrap revision, until protected base has policy.
-              if base_sha != '731d72ca1a9511981f1053b8d230f34719d3c23e':
-                  raise
-              policy_file = api(f'repos/{repo}/contents/.github/ai-dlc.json?ref=20c3a12bd1d9d1152456dd280351a7cd7719e1e4')
-          policy = json.loads(base64.b64decode(policy_file['content']))
-          allowed = set(policy['allowed_ai_reviewers'])
-          latest = {}
-          page = 1
-          while True:
-              reviews = api(f'repos/{repo}/pulls/{number}/reviews?per_page=100&page={page}')
-              for review in reviews:
-                  user = review['user']
-                  if user['login'] in allowed and user['type'] == 'Bot' and user['login'] != pr['user']['login']:
-                      if review['state'] in {'APPROVED', 'CHANGES_REQUESTED', 'DISMISSED'}:
-                          latest[user['login']] = review
-              if len(reviews) < 100:
-                  break
-              page += 1
-          for review in latest.values():
-              if review['state'] == 'APPROVED' and review['commit_id'] == pr['head']['sha']:
-                  print(f"Independent AI approval verified: {review['html_url']} at {pr['head']['sha']}")
-                  break
-          else:
-              raise SystemExit('BLOCKED: provision an independent AI reviewer and obtain APPROVED review on the current head. Human approvals, comments and self-review do not satisfy this gate.')
+      - name: Record review-state notification
+        run: echo 'Review state changed. Only the trusted App check and live merge authorization enforce approval.'

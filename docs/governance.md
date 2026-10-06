@@ -10,9 +10,9 @@
 Use merge commits for release/hotfix synchronization to preserve ancestry. Avoid rebasing or squashing the long-lived integration history. Delete completed feature branches through a controlled AI operation; retain main and develop.
 
 ## Gates
-Active rulesets cover main, develop, release/* and hotfix/*: PR required, conversations resolved, strict `governance` and `independent-ai-review` status checks, no force pushes or deletion, and no bypass actors. Required checks fail closed. Human code approvals and human CODEOWNERS are not used.
+Active rulesets cover main, develop, release/* and hotfix/*: PR required, conversations resolved, strict `governance` and App-source-bound `trusted-independent-ai-review` status checks, no force pushes or deletion, and no bypass actors. Required checks fail closed. Human code approvals and human CODEOWNERS are not used.
 
-The independent-ai-review check accepts an APPROVED GitHub PR review from an explicitly allowed AI bot, attached to the current head SHA and distinct from the author. Provisioning that reviewer is a Phase 0 prerequisite; comments, self-review and skipped checks cannot satisfy it. Supported bot identities are in .github/ai-dlc.json; verify the actual integration identity before changing that list.
+The trusted-independent-ai-review check accepts an APPROVED GitHub PR review from an explicitly allowed AI bot, attached to the current head SHA and distinct from the author. Provisioning that reviewer is a Phase 0 prerequisite; comments, self-review and skipped checks cannot satisfy it. Supported bot identities are in .github/ai-dlc.json; verify the actual integration identity before changing that list.
 
 The bootstrap feature PR cannot merge before both gates pass. To promote governance into main without pretending it is a product release, an AI opens a develop → main PR titled `chore: promote Phase 0 governance`; its body links the bootstrap Issue and states `Phase 0 governance promotion`. The policy allows this route only while phase is 0 and no implementation paths exist. No tag or package is published.
 
@@ -34,4 +34,7 @@ The trusted control repository is https://github.com/glyad/shell-web-components-
 
 Target ruleset 24470179 requires this check specifically from App 5210232 plus governance, an approving review, and resolved threads, with no bypass actors. Separate ruleset 24581972 restricts protected updates to that App through PRs. Cached successful checks cannot independently authorize an ordinary user to merge. The App has metadata/PR read and checks/contents write, is installed only on shell-web-components, and its key is restricted to the control repository main environment. Contents write permits editing repository contents as well as merges; protected update restrictions and the reviewed worker constrain its use.
 
-The old Actions independent-ai-review job remains diagnostic. A passing workflow name alone does not satisfy the integration-bound trusted check. Phase 0 remains open until live enforcement and reviewed promotion to main are verified.
+The former Actions review gate now only emits review-state notifications for the trusted relay; it does not claim to verify approval. A passing workflow name alone does not satisfy the integration-bound trusted check. Phase 0 remains open until live enforcement and reviewed promotion to main are verified.
+
+## Review batching and current deployment state
+Automatic Copilot review rules are disabled. Consolidate and test all fixes before a single authorized review; do not increase spending without owner approval. The trusted worker is disabled pending independently reviewed live Issue-link and final PR-state safeguards in control PR #4. Target PR #2 remains unmerged. Native approval and check requirements are retained.

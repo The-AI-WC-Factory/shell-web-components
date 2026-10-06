@@ -21,6 +21,8 @@ jobs:
           persist-credentials: false
       - name: Validate policy and Git Flow
         run: python3 .github/scripts/validate_governance.py
+      - name: Test governance handoff safeguards
+        run: python3 -m unittest discover -s tests -v
       - name: Upload governance evidence
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
