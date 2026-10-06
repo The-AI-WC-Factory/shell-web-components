@@ -18,14 +18,31 @@ required = ['README.md', 'LICENSE', 'AGENTS.md', 'CONTRIBUTING.md', 'SECURITY.md
 for name in required:
     require((ROOT / name).is_file(), f'Missing {name}')
 
-policy = json.loads((ROOT / '.github/ai-dlc.json').read_text())
-require(policy['human_role'] == 'product_management_only', 'Human role must be product management only')
-require(policy['engineering_operator'] == 'ai_only', 'Engineering must be AI-operated')
-require(policy['license'] == 'MIT' and policy['git_flow'] is True, 'MIT and Git Flow are required')
+def write_evidence(phase=None):
+    evidence = {'phase': phase, 'commit': os.environ.get('GITHUB_SHA', 'local'),
+                'run_id': os.environ.get('GITHUB_RUN_ID'), 'passed': not errors,
+                'checks': ['required-files', 'ai-only-contract', 'MIT', 'phase-boundary', 'workflow-pins', 'git-flow'],
+                'errors': errors, 'component_tests': 'not applicable: no components implemented'}
+    (ROOT / 'governance-evidence.json').write_text(json.dumps(evidence, indent=2) + '\n')
+
+if errors:
+    write_evidence()
+    raise SystemExit('\n'.join(errors))
+try:
+    policy = json.loads((ROOT / '.github/ai-dlc.json').read_text())
+    if not isinstance(policy, dict):
+        raise ValueError('Policy must be a JSON object')
+except (ValueError, OSError) as error:
+    errors.append(f'Cannot read governance policy: {error}')
+    write_evidence()
+    raise SystemExit('\n'.join(errors))
+require(policy.get('human_role') == 'product_management_only', 'Human role must be product management only')
+require(policy.get('engineering_operator') == 'ai_only', 'Engineering must be AI-operated')
+require(policy.get('license') == 'MIT' and policy.get('git_flow') is True, 'MIT and Git Flow are required')
 license_text = (ROOT / 'LICENSE').read_text()
 require('MIT License' in license_text and 'Permission is hereby granted' in license_text, 'MIT license missing')
 
-if policy['phase'] == 0:
+if policy.get('phase') == 0:
     for path in ['src', 'components', 'packages', 'examples', 'demo', 'dist', 'package.json']:
         require(not (ROOT / path).exists(), f'Implementation is out of Phase 0 scope: {path}')
 
@@ -48,7 +65,7 @@ if pr:
     feature = bool(re.fullmatch(r'feature/\d+-[a-z0-9][a-z0-9-]*', head))
     hotfix = bool(re.fullmatch(r'hotfix/\d+-[a-z0-9][a-z0-9-]*', head))
     release = bool(re.fullmatch(r'release/\d+\.\d+\.\d+(?:-[a-z0-9.-]+)?', head))
-    promotion = (policy['phase'] == 0 and head == 'develop' and base == 'main'
+    promotion = (policy.get('phase') == 0 and head == 'develop' and base == 'main'
                  and title == 'chore: promote Phase 0 governance'
                  and 'Phase 0 governance promotion' in body)
     valid = ((base == 'develop' and (feature or release or hotfix))
@@ -60,11 +77,7 @@ if pr:
         require(bool(re.search(rf'(?i)\b(?:refs|closes|fixes|resolves)\s+#{issue}\b', body)),
                 'Feature branch Issue number must match PR reference')
 
-evidence = {'phase': policy['phase'], 'commit': os.environ.get('GITHUB_SHA', 'local'),
-            'run_id': os.environ.get('GITHUB_RUN_ID'), 'passed': not errors,
-            'checks': ['required-files', 'ai-only-contract', 'MIT', 'phase-boundary', 'workflow-pins', 'git-flow'],
-            'errors': errors, 'component_tests': 'not applicable: no components implemented'}
-(ROOT / 'governance-evidence.json').write_text(json.dumps(evidence, indent=2) + '\n')
+write_evidence(policy.get('phase'))
 if errors:
     raise SystemExit('\n'.join(errors))
 print('Phase 0 governance checks passed; component testing is not yet applicable.')
