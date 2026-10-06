@@ -46,7 +46,7 @@ if policy.get('phase') == 0:
     for path in ['src', 'components', 'packages', 'examples', 'demo', 'dist', 'package.json']:
         require(not (ROOT / path).exists(), f'Implementation is out of Phase 0 scope: {path}')
 
-for workflow in (ROOT / '.github/workflows').glob('*.yml'):
+for workflow in sorted(p for p in (ROOT / '.github/workflows').iterdir() if p.suffix in {'.yml', '.yaml'}):
     body = workflow.read_text()
     require('pull_request_target:' not in body, f'Unsafe PR target trigger: {workflow.name}')
     require('permissions:' in body, f'Explicit permissions missing: {workflow.name}')
