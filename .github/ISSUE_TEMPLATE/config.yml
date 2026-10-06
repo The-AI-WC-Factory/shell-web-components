@@ -1,5 +1,5 @@
 blank_issues_enabled: false
 contact_links:
   - name: Security reporting
-    url: https://github.com/The-AI-WC-Factory/shell-web-components/security/policy
+    url: https://github.com/glyad/shell-web-components/security/policy
     about: Follow the private security reporting policy; do not publish sensitive details.

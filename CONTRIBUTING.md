@@ -9,3 +9,6 @@ Follow docs/governance.md. Link the Issue using `Refs #N`; close it only when al
 Local governance validation: `python3 .github/scripts/validate_governance.py`. This is a scaffold check, not a component test suite.
 
 Contributions are licensed under the repository's MIT license. Report vulnerabilities using SECURITY.md rather than public Issues containing exploit details or secrets.
+
+
+Every PR must have a native GitHub Development link to its corresponding Issue; a textual Refs #N mention alone is insufficient. Verify the link after PR creation and before merge. For Git Flow PRs targeting develop, set the Development link manually because closing keywords only take effect on the default branch. Keep the bootstrap Issue open until all Phase 0 acceptance criteria pass, even if a linked feature PR has merged.

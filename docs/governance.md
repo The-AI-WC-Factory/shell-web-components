@@ -17,7 +17,10 @@ The independent-ai-review check accepts an APPROVED GitHub PR review from an exp
 The bootstrap feature PR cannot merge before both gates pass. To promote governance into main without pretending it is a product release, an AI opens a develop → main PR titled `chore: promote Phase 0 governance`; its body links the bootstrap Issue and states `Phase 0 governance promotion`. The policy allows this route only while phase is 0 and no implementation paths exist. No tag or package is published.
 
 ## Project
-Use the organization Project named `Web Components 2.0 — AI-DLC`, link the repository, and track the bootstrap Issue and PR. Status: Todo/In Progress/Done; Phase: Phase 0/Phase 1/Release. Keep the bootstrap Issue open while any acceptance criterion is blocked. Project automation must use a dedicated narrow app/token if cross-project API access is needed; GITHUB_TOKEN alone must not be assumed to have organization Project access.
+Use the personal Project [Web Components 2.0 — AI-DLC](https://github.com/users/glyad/projects/1), link the repository, and track the bootstrap Issue and PR. The original organization Project is retained as migration history. Status: Todo/In Progress/Done; Phase: Phase 0/Phase 1/Release. Keep the bootstrap Issue open while any acceptance criterion is blocked. Project automation must use a dedicated narrow app/token if cross-project API access is needed; GITHUB_TOKEN alone must not be assumed to have owner-level Project access.
 
 ## Audit record
 Each PR links an Issue, identifies AI execution, records check/artifact links and independent reviewer evidence. AI authors technical decisions. Product-management decisions stay in Issues. Phase 0 is not complete until enforcement, CI, independent review and branch promotion have been verified.
+
+
+Every PR must have a native GitHub Development link to its corresponding Issue; a textual Refs #N mention alone is insufficient. Verify the link after PR creation and before merge. For Git Flow PRs targeting develop, set the Development link manually because closing keywords only take effect on the default branch. Keep the bootstrap Issue open until all Phase 0 acceptance criteria pass, even if a linked feature PR has merged.

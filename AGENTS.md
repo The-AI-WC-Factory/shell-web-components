@@ -13,3 +13,6 @@ Humans perform product management only. AI performs every engineering activity, 
 9. Release only after the release gates and npm scope/trusted publisher setup are verified. Phase 0 publishes no package or production release.
 
 Superpowers skills are opt-in; use them only when explicitly requested for the current task or enabled by project instructions.
+
+
+Every PR must have a native GitHub Development link to its corresponding Issue; a textual Refs #N mention alone is insufficient. Verify the link after PR creation and before merge. For Git Flow PRs targeting develop, set the Development link manually because closing keywords only take effect on the default branch. Keep the bootstrap Issue open until all Phase 0 acceptance criteria pass, even if a linked feature PR has merged.

@@ -8,6 +8,6 @@ Humans define product intent and priorities. AI owns architecture, design, codin
 
 See [the product charter](docs/product-charter.md), [agent instructions](AGENTS.md), [contribution policy](CONTRIBUTING.md), [GitHub governance](docs/governance.md), and [release policy](docs/releases.md).
 
-The working npm name is `@ai-factored/shell-web-components`; this is tentative until scope ownership is verified. The repository owner is `The-AI-WC-Factory`.
+The working npm name is `@ai-factored/shell-web-components`; this is tentative until scope ownership is verified. The repository owner is `glyad`.
 
 Git Flow uses `main` for released states and `develop` for the next integrated release. Every engineering change starts with an Issue and an AI-operated feature PR. Phase 0 uses a documented one-time governance promotion without publishing a release.

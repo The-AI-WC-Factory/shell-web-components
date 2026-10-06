@@ -1,7 +1,7 @@
 # Product charter
 
 ## Intent
-Build a standards-based Web Components library for modern evergreen browsers. Public source is owned by The AI WC Factory (`The-AI-WC-Factory`) in `shell-web-components`, under MIT.
+Build a standards-based Web Components library for modern evergreen browsers. Public source is owned by the personal account `glyad` in `shell-web-components`, under MIT.
 
 ## Operating model
 Humans own product goals, priorities, acceptance criteria, branding and general constraints. AI owns requirements refinement, architecture, design, implementation, testing, security, documentation, engineering review, packaging and release. Human account consent is not engineering review.
