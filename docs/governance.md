@@ -24,3 +24,10 @@ Each PR links an Issue, identifies AI execution, records check/artifact links an
 
 
 Every PR must have a native GitHub Development link to its corresponding Issue; a textual Refs #N mention alone is insufficient. Verify the link after PR creation and before merge. For Git Flow PRs targeting develop, set the Development link manually because closing keywords only take effect on the default branch. Keep the bootstrap Issue open until all Phase 0 acceptance criteria pass, even if a linked feature PR has merged.
+
+
+## Dependency update handoff
+Dependabot PRs are update candidates, not merge-ready engineering PRs. The AI maintainer creates a dedicated dependency Issue, branches `feature/<issue>-dependency-update` from develop, applies the candidate diff, opens a native Issue-linked PR with `Refs #<issue>`, and obtains governance checks and current-head independent AI approval. Link the original Dependabot candidate in that PR. Close the candidate only after the compliant feature PR merges. Never exempt Dependabot branches from Git Flow or Issue linkage.
+
+## Approval verifier trust boundary — Phase 0 blocker
+The proposed Actions review job is a diagnostic, not a tamper-proof independent approval authority: PR-defined Actions can impersonate its job name under the same Actions integration. Phase 0 must remain blocked until a dedicated trusted GitHub App publishes the required approval check on the exact reviewed PR head, and the ruleset binds that check to the App's integration ID. The App must execute no PR code, load policy from protected base code (with an explicit pinned bootstrap policy), re-fetch the PR head before reporting, reject stale approvals, retain decisions across comment-only reviews, and handle dismissal/changes requested. Required installation permissions: metadata read, contents read, pull requests read, checks write. No contents-write, administration or merge permission. App hosting, credentials and installation must be provisioned before claiming this guarantee. Do not bypass existing rules or merge the bootstrap while this blocker remains.

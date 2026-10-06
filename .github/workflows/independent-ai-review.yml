@@ -4,12 +4,6 @@ on:
     types: [opened, synchronize, reopened, ready_for_review]
   pull_request_review:
     types: [submitted, edited, dismissed]
-  workflow_dispatch:
-    inputs:
-      pr_number:
-        description: Pull request number to verify
-        required: true
-        type: string
 permissions:
   contents: read
   pull-requests: read
@@ -23,7 +17,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           REPOSITORY: ${{ github.repository }}
-          PR_NUMBER: ${{ github.event.pull_request.number || inputs.pr_number }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
         shell: python
         run: |
           import json, os, subprocess
@@ -34,7 +28,19 @@ jobs:
               raise SystemExit('A numeric PR number is required')
           repo = os.environ['REPOSITORY']
           pr = api(f'repos/{repo}/pulls/{number}')
-          allowed = {'chatgpt-codex-connector[bot]', 'copilot-pull-request-reviewer[bot]'}
+          import base64
+          # Policy comes from protected base code, never the proposed PR policy.
+          base_sha = pr['base']['sha']
+          policy_path = f'repos/{repo}/contents/.github/ai-dlc.json?ref={base_sha}'
+          try:
+              policy_file = api(policy_path)
+          except subprocess.CalledProcessError as error:
+              # Exact immutable bootstrap revision, until protected base has policy.
+              if base_sha != '731d72ca1a9511981f1053b8d230f34719d3c23e':
+                  raise
+              policy_file = api(f'repos/{repo}/contents/.github/ai-dlc.json?ref=20c3a12bd1d9d1152456dd280351a7cd7719e1e4')
+          policy = json.loads(base64.b64decode(policy_file['content']))
+          allowed = set(policy['allowed_ai_reviewers'])
           latest = {}
           page = 1
           while True:
@@ -42,7 +48,8 @@ jobs:
               for review in reviews:
                   user = review['user']
                   if user['login'] in allowed and user['type'] == 'Bot' and user['login'] != pr['user']['login']:
-                      latest[user['login']] = review
+                      if review['state'] in {'APPROVED', 'CHANGES_REQUESTED', 'DISMISSED'}:
+                          latest[user['login']] = review
               if len(reviews) < 100:
                   break
               page += 1

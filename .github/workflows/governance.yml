@@ -1,6 +1,7 @@
 name: Phase 0 governance
 on:
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review, edited]
     branches: [main, develop, 'release/**', 'hotfix/**']
   push:
     branches: [main, develop]
